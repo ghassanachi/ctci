@@ -1,2 +1,3 @@
 pub mod problems;
-pub mod structures;
+mod structures;
+pub use structures::linkedlist;

@@ -12,7 +12,7 @@ pub fn all_chars_unique_part_a(s: &str) -> bool {
 }
 
 pub fn all_chars_unique_part_b(s: &str) -> bool {
-    let mut bit_map: u32 = 0;
+    let mut bit_map: i32 = 0;
     let base_char: u32 = 'a' as u32;
 
     for c in s.chars() {
