@@ -1,13 +1,3 @@
-/**
- * Implementation copied from https://github.com/modulitos/CtCI-rust.git
- *
- * Edits:
- * - Removed some of the global bounds on T and added them where needed,
- * - Added `values()` method which retruns an iterator on T (helps with testing)
- * - Added `remove_next()` method on node. Makes is a little easier to write functions
- *   operating directly on nodes and is quicker than traversing the while list.
- *
- */
 use std::cell::RefCell;
 use std::convert::From;
 use std::fmt;
@@ -22,6 +12,17 @@ pub type NodeRef<T> = Rc<RefCell<Node<T>>>;
 // Used specifically for hashing needs, like HashSet:
 pub struct HashedNode<T>(NodeRef<T>);
 
+/// # Copied from [modulitos/CtCI-rust][`ll-url`]
+///
+/// # Changes
+/// - Removed some of the global bounds on T and added them where needed,
+/// - Added [`values`] method which retruns an iterator on T (helps with testing)
+/// - Added [`remove_next`] method on [Node<T>], which makes is a little easier to write
+/// functions operating directly on nodes and is quicker than traversing the while list.
+///
+/// [`values`]: #method.values
+/// [`ll-url`]: https://github.com/modulitos/CtCI-rust
+/// [`remove_next`]: Node<T>::remove_next
 #[derive(Debug)]
 pub struct LinkedList<T> {
     pub head: Option<NodeRef<T>>,
@@ -32,16 +33,14 @@ pub struct Node<T> {
     pub next: Option<NodeRef<T>>,
 }
 
-///  WARNING:
-///  - There is currently a bug that might cause the iterator to return an
-///  element that has been remove with `remove_next`. This would happen if the iterator
-///  currently holds a reference to it, and specifically that this element is the last in the
-///  list.
-///  - I've left the bug for now, since I want to focus on doing problems.
-///
-///  TODO: Fix Iter implementation so that it no longer holds on to "next" element, since allow
-///  it to see changes to the options if remove_next is called on last element.
 impl<T> Node<T> {
+    /// Removes and returns the `next` element, and replaces with it's next element.
+    ///
+    /// # Warning
+    /// There is currently a bug that might cause the iterator to return an element that has been
+    /// removed. This would happen if the iterator currently holds a reference to it, and
+    /// specifically if this element is the last in the list.
+    // TODO: Fix above warning with a new Iter implementation which does not hold next;
     pub fn remove_next(&mut self) -> Option<NodeRef<T>>
     where
         T: Clone,

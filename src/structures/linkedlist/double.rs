@@ -1,11 +1,3 @@
-/**
- * Implementation copied from https://github.com/modulitos/CtCI-rust.git
- *
- * Edits:
- * - Removed some of the global bounds on T and added them where needed,
- * - Added `values()` method which retruns an iterator on T (helps with testing)
- *
- *  */
 use std::cell::RefCell;
 use std::fmt;
 use std::fmt::Display;
@@ -31,7 +23,13 @@ impl<T: fmt::Debug> fmt::Debug for Node<T> {
         write!(f, "Node {{ data: {:?}, next: {:?} }}", self.data, self.next)
     }
 }
-
+/// # Copied from [modulitos/CtCI-rust][`ll-url`]
+///
+/// # Changes
+/// - Removed some of the global bounds on T and added them where needed,
+/// - Added [`values`] method which retruns an iterator on T (helps with testing)
+///
+/// [`values`]: #method.values
 impl<T> LinkedList<T>
 where
     T: std::clone::Clone,
