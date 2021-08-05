@@ -35,15 +35,12 @@ pub fn sum_lists_backwards(
 fn _recurse(l1: &Option<NodeRef<i32>>, l2: &Option<NodeRef<i32>>) -> Option<(i32, NodeRef<i32>)> {
     match (l1, l2) {
         (Some(l1_node), Some(l2_node)) => {
-            let val = l1_node.as_ref().borrow().data + l2_node.as_ref().borrow().data;
+            let val = l1_node.borrow().data + l2_node.borrow().data;
             let l1_node = Rc::clone(l1_node);
             let l2_node = Rc::clone(l2_node);
             let mut remainder = 0;
             let mut next: Option<NodeRef<i32>> = None;
-            if let Some((r, n)) = _recurse(
-                &l1_node.as_ref().borrow().next,
-                &l2_node.as_ref().borrow().next,
-            ) {
+            if let Some((r, n)) = _recurse(&l1_node.borrow().next, &l2_node.borrow().next) {
                 remainder = r;
                 next = Some(n);
             }

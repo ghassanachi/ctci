@@ -6,7 +6,7 @@ use std::rc::Rc;
 
 pub fn get_next_data<T: Clone>(node: &Rc<RefCell<Node<T>>>) -> Option<T> {
     let node = Rc::clone(&node);
-    let next = &node.as_ref().borrow().next;
+    let next = &node.borrow().next;
     next.as_deref().map(|node| node.borrow().data.clone())
 }
 
@@ -26,9 +26,9 @@ pub fn partition<T: Clone + Default + Ord + PartialOrd + Debug + Display>(
             if data < partition_on {
                 break;
             }
-            let next_node = { node.as_ref().borrow_mut().remove_next() };
+            let next_node = { node.borrow_mut().remove_next() };
             if let Some(n) = next_node {
-                tail.as_ref().borrow_mut().next = Some(Rc::clone(&n));
+                tail.borrow_mut().next = Some(Rc::clone(&n));
                 tail = n;
             }
         }
@@ -37,14 +37,14 @@ pub fn partition<T: Clone + Default + Ord + PartialOrd + Debug + Display>(
     // Add tail to list
     let mut iter = list.iter();
     while let Some(node) = iter.next() {
-        let end = node.as_ref().borrow().next.is_none();
+        let end = node.borrow().next.is_none();
         if end {
             if let Some(tail) = &tail_list.head {
-                node.as_ref().borrow_mut().next = tail.as_ref().borrow_mut().next.take()
+                node.borrow_mut().next = tail.borrow_mut().next.take()
             }
         }
     }
-    let mut head = { list.head.take().unwrap().as_ref().borrow_mut().next.take() };
+    let mut head = { list.head.take().unwrap().borrow_mut().next.take() };
     mem::swap(&mut list.head, &mut head);
 }
 

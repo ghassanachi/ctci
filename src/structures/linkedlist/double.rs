@@ -177,7 +177,7 @@ impl<'a, T: Clone> Iterator for ValuesIter<T> {
     type Item = T;
     fn next(&mut self) -> Option<Self::Item> {
         self.base.next().map(|node| {
-            let val = node.as_ref().borrow().data.clone();
+            let val = node.borrow().data.clone();
             val
         })
     }
@@ -186,7 +186,7 @@ impl<'a, T: Clone> Iterator for ValuesIter<T> {
 impl<'a, T: Clone> DoubleEndedIterator for ValuesIter<T> {
     fn next_back(&mut self) -> Option<Self::Item> {
         self.base.next_back().map(|node| {
-            let val = node.as_ref().borrow().data.clone();
+            let val = node.borrow().data.clone();
             val
         })
     }

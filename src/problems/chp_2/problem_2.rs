@@ -13,9 +13,9 @@ pub fn find_kth_last_element<T: Clone>(list: &SinglyLinkedList<T>, k: usize) -> 
     let mut last_node: Option<NodeRef<T>> = None;
     loop {
         match (back.next(), front.next()) {
-            (Some(node), None) => return Some(node.as_ref().borrow().data.clone()),
+            (Some(node), None) => return Some(node.borrow().data.clone()),
             (Some(node), Some(_)) => last_node = Some(Rc::clone(&node)),
-            (None, None) => return last_node.map(|node| node.as_ref().borrow().data.clone()),
+            (None, None) => return last_node.map(|node| node.borrow().data.clone()),
             // If the list contains a cycle it will run forever
             // It is impossible for the back iterator finish first
             _ => unreachable!(),

@@ -60,7 +60,7 @@ pub fn list_palindrome(list: &mut SinglyLinkedList<char>) -> bool {
     // recreate original list by reversing tail and adding it back to list
     tail_list.head = reverse(&mut tail_list.head);
 
-    if let Some(last) = list.iter().last() {
+    if let Some(last) = list.tail() {
         last.borrow_mut().next = tail_list.head.take()
     }
 

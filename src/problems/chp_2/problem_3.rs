@@ -5,19 +5,19 @@ use std::rc::Rc;
 pub fn delete_middle_node<T: Clone + Default + Debug>(node: Option<NodeRef<T>>) {
     let mut cursor = node;
     while let Some(ref current_node) = cursor {
-        let next = if let Some(next) = &current_node.as_ref().borrow().next {
+        let next = if let Some(next) = &current_node.borrow().next {
             Some(Rc::clone(next))
         } else {
             None
         };
         if let Some(node) = next {
             // Check if we are at the end
-            let end = { node.as_ref().borrow().next.is_none() };
+            let end = { node.borrow().next.is_none() };
             // Clone the data
-            current_node.as_ref().borrow_mut().data = node.as_ref().borrow().data.clone();
+            current_node.borrow_mut().data = node.borrow().data.clone();
             // Remove next child
             if end {
-                current_node.as_ref().borrow_mut().remove_next();
+                current_node.borrow_mut().remove_next();
                 cursor.take();
             } else {
                 cursor = Some(node);

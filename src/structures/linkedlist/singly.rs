@@ -50,7 +50,7 @@ impl<T> Node<T> {
         if let Some(next) = &mut self.next {
             let next_node = next.borrow_mut().next.take();
             if let Some(dst) = next_node {
-                next.swap(dst.as_ref());
+                next.swap(&dst);
                 return Some(Rc::clone(&dst));
             } else {
                 self.next = None;
@@ -202,7 +202,7 @@ impl<'a, T: Clone> Iterator for ValuesIter<T> {
     type Item = T;
     fn next(&mut self) -> Option<Self::Item> {
         self.base.next().map(|node| {
-            let val = node.as_ref().borrow().data.clone();
+            let val = node.borrow().data.clone();
             val
         })
     }
@@ -281,10 +281,6 @@ impl<T: PartialEq> PartialEq for LinkedList<T> {
     }
 
     fn ne(&self, other: &Self) -> bool {
-        // println!(
-        //     "comparing two lists: self.head: {:?}, other.head: {:?}",
-        //     self.head, other.head
-        // );
         self.head != other.head
     }
 }
