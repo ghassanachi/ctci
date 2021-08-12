@@ -14,4 +14,6 @@
 //! [`ll-url`]: https://github.com/modulitos/CtCI-rust
 pub mod problems;
 mod structures;
+
 pub use structures::linkedlist;
+pub use structures::stack;
