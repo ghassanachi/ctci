@@ -1,2 +1,5 @@
-pub mod linkedlist;
-pub mod stack;
+mod linkedlist;
+mod stack;
+
+pub use linkedlist::*;
+pub use stack::*;

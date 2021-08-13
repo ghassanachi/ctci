@@ -1,4 +1,4 @@
-use crate::structures::stack::Stack;
+use crate::structures::Stack;
 use std::cmp::Ordering;
 use std::fmt::Debug;
 

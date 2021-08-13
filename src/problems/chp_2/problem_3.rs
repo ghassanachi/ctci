@@ -1,4 +1,4 @@
-use crate::linkedlist::*;
+use crate::structures::*;
 use std::fmt::Debug;
 use std::rc::Rc;
 

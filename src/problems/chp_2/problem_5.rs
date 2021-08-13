@@ -1,4 +1,4 @@
-use crate::linkedlist::*;
+use crate::structures::*;
 use std::cell::RefCell;
 use std::rc::Rc;
 
