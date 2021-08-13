@@ -108,6 +108,15 @@ where
     }
 }
 
+impl<T> Drop for LinkedList<T> {
+    fn drop(&mut self) {
+        let mut cur_link = self.head.take();
+        while let Some(boxed_node) = cur_link {
+            cur_link = boxed_node.borrow_mut().next.take()
+        }
+    }
+}
+
 impl<T> FromIterator<T> for LinkedList<T>
 where
     T: Clone,
