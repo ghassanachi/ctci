@@ -131,26 +131,31 @@ where
 
 impl<T> BinaryTree<T>
 where
-    T: PartialOrd,
+    T: PartialOrd + Copy,
 {
-    fn is_valid_helper(node: &NodeRef<T>) -> bool {
+    fn is_valid_helper(node: &NodeRef<T>, min: Option<T>, max: Option<T>) -> bool {
         if let Some(node) = node {
-            let valid = match (&node.left, &node.right) {
-                (None, None) => true,
-                (None, Some(right)) => right.val >= node.val,
+            let left_valid = match (&node.left, min) {
                 (Some(left), None) => left.val <= node.val,
-                (Some(left), Some(right)) => right.val >= node.val && left.val <= node.val,
+                (Some(left), Some(min)) => left.val <= node.val && left.val >= min,
+                _ => true,
             };
-            if !valid {
-                return false;
+            let right_valid = match (&node.right, max) {
+                (Some(right), None) => right.val >= node.val,
+                (Some(right), Some(max)) => right.val >= node.val && right.val < max,
+                _ => true,
+            };
+            if left_valid && right_valid {
+                return Self::is_valid_helper(&node.left, min, Some(node.val))
+                    && Self::is_valid_helper(&node.right, Some(node.val), max);
             }
-            return Self::is_valid_helper(&node.left) && Self::is_valid_helper(&node.right);
+            return false;
         }
         true
     }
 
     pub fn is_valid_bst(&self) -> bool {
-        Self::is_valid_helper(&self.root)
+        Self::is_valid_helper(&self.root, None, None)
     }
 }
 
@@ -175,6 +180,123 @@ mod tests {
             Some(7),
         ]);
         assert_eq!(tree.depth(), 3);
+    }
+
+    #[test]
+    fn binary_tree_basic_validate_bst() {
+        //     Valid tree:
+        //          4
+        //        /   \
+        //       2     6
+        //      / \   / \
+        //     1   3 5   7
+        let tree = BinaryTree::build(&vec![
+            Some(4),
+            Some(2),
+            Some(1),
+            None,
+            None,
+            Some(3),
+            None,
+            None,
+            Some(6),
+            Some(5),
+            None,
+            None,
+            Some(7),
+        ]);
         assert!(tree.is_valid_bst());
+
+        //    Invalid tree 1:
+        //          4
+        //        /   \
+        //       2     7
+        //      / \   / \
+        //     1   5 6   8
+        let tree = BinaryTree::build(&vec![
+            Some(4),
+            Some(2),
+            Some(1),
+            None,
+            None,
+            Some(5),
+            None,
+            None,
+            Some(7),
+            Some(6),
+            None,
+            None,
+            Some(8),
+        ]);
+        assert!(!tree.is_valid_bst());
+
+        //    Invalid tree 2:
+        //          4
+        //        /   \
+        //       2     6
+        //      / \   / \
+        //     1   3 2   7
+        let tree = BinaryTree::build(&vec![
+            Some(4),
+            Some(2),
+            Some(1),
+            None,
+            None,
+            Some(3),
+            None,
+            None,
+            Some(6),
+            Some(2),
+            None,
+            None,
+            Some(7),
+        ]);
+        assert!(!tree.is_valid_bst());
+
+        //     Valid tree: duplicates should be stored on right branch
+        //          4
+        //        /   \
+        //       2     6
+        //      / \   / \
+        //     1   3 4   7
+        let tree = BinaryTree::build(&vec![
+            Some(4),
+            Some(2),
+            Some(1),
+            None,
+            None,
+            Some(3),
+            None,
+            None,
+            Some(6),
+            Some(4),
+            None,
+            None,
+            Some(7),
+        ]);
+        assert!(tree.is_valid_bst());
+
+        //     Invalid tree: duplicates should be stored on right branch
+        //          4
+        //        /   \
+        //       2     6
+        //      / \   / \
+        //     1   4 5   7
+        let tree = BinaryTree::build(&vec![
+            Some(4),
+            Some(2),
+            Some(1),
+            None,
+            None,
+            Some(4),
+            None,
+            None,
+            Some(6),
+            Some(5),
+            None,
+            None,
+            Some(7),
+        ]);
+        assert!(!tree.is_valid_bst());
     }
 }
