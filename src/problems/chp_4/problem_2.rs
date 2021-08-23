@@ -48,7 +48,7 @@ mod tests {
 
     #[test]
     fn bt_from_sorted_4() {
-        let input: Vec<u32> = vec![1, 2, 3, 4, 5, 5, 5, 6, 7, 8, 9];
+        let input: Vec<u32> = vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
         let tree = bt_from_sorted(&input);
         assert!(tree.is_valid_bst());
         assert_eq!(tree.depth(), 4);
