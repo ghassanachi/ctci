@@ -1,6 +1,6 @@
 /// Very rough implementation of a BinaryTree.
 ///
-/// Add some helper/conveninence methods as needed while working on Chp4 problem 2 and 3.
+/// Add some helper/conveninence methods as needed while working on Chp4 problem 2 through 5.
 /// I'll most likely implement a Rc / RefCell implementation of a Binary Tree for future problems
 /// certain algorithms (like bfs) don't play well with the Borrow checker.
 ///
