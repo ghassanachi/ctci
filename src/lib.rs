@@ -4,8 +4,8 @@
 //! `Cracking The Coding Interview` book
 //!
 //! ## Notes
-//!  - I've used [SinglyLinkedList][structures::linkedlist::SinglyLinkedList] and
-//!  [DoubleLinkedList][structures::linkedlist::LinkedList] implementations grabbed
+//!  - I've used [SinglyLinkedList][structures::SinglyLinkedList] and
+//!  [DoubleLinkedList][structures::LinkedList] implementations grabbed
 //!  from [modulitos/CtCI-rust][`ll-url`] since the [`std::collections::LinkedList`]'s iterators
 //!  iterate on inner type which goes against the intended solutions.
 //!  - I've made some tweaks to the above implementations with some helper methods as well as

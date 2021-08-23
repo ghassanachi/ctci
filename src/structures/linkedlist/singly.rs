@@ -18,13 +18,13 @@ pub struct HashedNode<T>(NodeRef<T>);
 /// - Removed some of the global bounds on T and added them where needed,
 /// - Added [`values`] method which retruns an iterator on T (helps with testing)
 /// - Added [`pop_front`] method which removes the first element of the linkedlist
-/// - Added [`remove_next`] method on [Node<T>], which makes is a little easier to write
+/// - Added [`remove_next`] method on [Node], which makes is a little easier to write
 /// functions operating directly on nodes and is quicker than traversing the while list.
 ///
 /// [`values`]: #method.values
 /// [`pop_front`]: #method.pop_front
 /// [`ll-url`]: https://github.com/modulitos/CtCI-rust
-/// [`remove_next`]: Node<T>::remove_next
+/// [`remove_next`]: Node::remove_next
 #[derive(Debug)]
 pub struct LinkedList<T> {
     pub head: Option<NodeRef<T>>,
