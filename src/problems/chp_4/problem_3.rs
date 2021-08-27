@@ -12,11 +12,11 @@ pub fn bt_to_ll<T: Copy>(tree: BinaryTree<T>) -> Vec<SinglyLinkedList<T>> {
         let mut current_level = SinglyLinkedList::new();
         let mut next_depth = VecDeque::new();
         for node in queue.drain(..) {
-            current_level.append(node.val);
-            if let Some(left) = node.left {
+            current_level.append(node.borrow().val);
+            if let Some(left) = node.as_ref().borrow().left.clone() {
                 next_depth.push_back(left);
             }
-            if let Some(right) = node.right {
+            if let Some(right) = node.as_ref().borrow().right.clone() {
                 next_depth.push_back(right);
             }
         }

@@ -1,4 +1,6 @@
 use crate::structures::{BinaryTree, TreeNode, TreeNodeRef};
+use std::cell::RefCell;
+use std::rc::Rc;
 
 pub fn bt_from_sorted<T: Copy>(arr: &[T]) -> BinaryTree<T> {
     let root = helper(arr);
@@ -14,7 +16,7 @@ pub fn helper<T: Copy>(arr: &[T]) -> TreeNodeRef<T> {
     let mut current = TreeNode::new(arr[mid]);
     current.left = helper(&arr[..mid]);
     current.right = helper(&arr[mid + 1..]);
-    Some(Box::new(current))
+    Some(Rc::new(RefCell::new(current)))
 }
 
 #[cfg(test)]
@@ -48,7 +50,7 @@ mod tests {
 
     #[test]
     fn bt_from_sorted_4() {
-        let input: Vec<u32> = vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+        let input: Vec<u32> = vec![1, 2, 3, 4, 5, 6, 7, 8, 9];
         let tree = bt_from_sorted(&input);
         assert!(tree.is_valid_bst());
         assert_eq!(tree.depth(), 4);

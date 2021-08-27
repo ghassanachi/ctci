@@ -1,3 +1,8 @@
+use crate::structures::{BinaryTreePrint, BinaryTreeUtil, BinaryTreeValidator};
+use std::cell::RefCell;
+use std::fmt::Display;
+use std::rc::Rc;
+
 /// Very rough implementation of a BinaryTree.
 ///
 /// Add some helper/conveninence methods as needed while working on Chp4 problem 2 through 5.
@@ -6,9 +11,14 @@
 ///
 /// I'll also likely implement one of the more advanced BST (either AVL or Red/Black for practice
 /// purposes)
-use std::fmt::{Display, Formatter, Result};
 
-pub type NodeRef<T> = Option<Box<Node<T>>>;
+#[derive(Debug)]
+pub struct BinaryTree<T> {
+    pub root: NodeRef<T>,
+}
+
+type BareNode<T> = Rc<RefCell<Node<T>>>;
+pub type NodeRef<T> = Option<BareNode<T>>;
 
 #[derive(Debug)]
 pub struct Node<T> {
@@ -27,27 +37,6 @@ impl<T> Node<T> {
     }
 }
 
-impl<T> Display for Node<T>
-where
-    T: Display,
-{
-    fn fmt(&self, f: &mut Formatter) -> Result {
-        write!(f, "{}", self.val)
-    }
-}
-
-#[derive(Debug)]
-pub struct BinaryTree<T> {
-    pub root: NodeRef<T>,
-}
-
-#[derive(Debug)]
-enum NodeType {
-    Left,
-    Right,
-    Root,
-}
-
 impl<T> BinaryTree<T> {
     fn build_helper(src: &[Option<T>], cur: &mut usize) -> NodeRef<T>
     where
@@ -58,11 +47,11 @@ impl<T> BinaryTree<T> {
         }
         if let Some(val) = &src[*cur] {
             *cur += 1;
-            Some(Box::new(Node {
+            Some(Rc::new(RefCell::new(Node {
                 val: *val,
                 left: Self::build_helper(src, cur),
                 right: Self::build_helper(src, cur),
-            }))
+            })))
         } else {
             *cur += 1;
             None
@@ -78,84 +67,59 @@ impl<T> BinaryTree<T> {
         Self { root }
     }
 
-    fn depth_helper(node: &NodeRef<T>) -> usize {
-        if let Some(node) = node {
-            let left_depth = Self::depth_helper(&node.left);
-            let right_depth = Self::depth_helper(&node.right);
-            return std::cmp::max(left_depth, right_depth) + 1;
+    pub fn depth(&self) -> usize {
+        if let Some(root) = &self.root {
+            return root.depth();
         }
         0
     }
 
-    pub fn depth(&self) -> usize {
-        Self::depth_helper(&self.root)
-    }
-}
-
-impl<T> BinaryTree<T>
-where
-    T: Display,
-{
-    fn pprint_helper(node: &Node<T>, prefix: String, node_type: NodeType) {
-        let prefix_current = "|- ";
-
-        println!("{}{} {:?}({})", prefix, prefix_current, node_type, node);
-
-        let prefix_child = "|  ";
-        let prefix = prefix + prefix_child;
-
-        if node.left.is_some() {
-            Self::pprint_helper(
-                node.left.as_deref().unwrap(),
-                prefix.to_string(),
-                NodeType::Left,
-            );
-        }
-        if node.right.is_some() {
-            Self::pprint_helper(
-                node.right.as_deref().unwrap(),
-                prefix.to_string(),
-                NodeType::Right,
-            );
-        }
-    }
-
-    pub fn pprint(&self) {
-        if let Some(root) = self.root.as_deref() {
-            Self::pprint_helper(root, "".to_string(), NodeType::Root);
-            return;
-        }
-        println!("Root: None");
-    }
-}
-
-impl<T> BinaryTree<T>
-where
-    T: PartialOrd + Copy,
-{
-    fn is_valid_helper(node: &NodeRef<T>, min: Option<T>, max: Option<T>) -> bool {
-        if let Some(node) = node {
-            let left_valid = match (&node.left, min) {
-                (Some(left), None) => left.val <= node.val,
-                (Some(left), Some(min)) => left.val <= node.val && left.val >= min,
-                _ => true,
-            };
-            let right_valid = match (&node.right, max) {
-                (Some(right), None) => right.val >= node.val,
-                (Some(right), Some(max)) => right.val >= node.val && right.val < max,
-                _ => true,
-            };
-            if left_valid && right_valid {
-                return Self::is_valid_helper(&node.left, min, Some(node.val))
-                    && Self::is_valid_helper(&node.right, Some(node.val), max);
-            }
-            return false;
+    pub fn is_valid_bst(&self) -> bool
+    where
+        T: PartialOrd + Copy,
+    {
+        if let Some(root) = &self.root {
+            return root.is_valid_bst();
         }
         true
     }
 
-    pub fn is_valid_bst(&self) -> bool {
-        Self::is_valid_helper(&self.root, None, None)
+    pub fn print(&self)
+    where
+        T: Display,
+    {
+        if let Some(root) = &self.root {
+            return root.pprint();
+        }
+        println!("Empty Tree");
+    }
+}
+
+impl<T> BinaryTreeUtil for BareNode<T> {
+    fn left(&self) -> Option<Self> {
+        self.borrow().left.as_ref().map(|n| n.clone())
+    }
+
+    fn right(&self) -> Option<Self> {
+        self.borrow().right.as_ref().map(|n| n.clone())
+    }
+}
+
+impl<T> BinaryTreePrint<T> for BareNode<T>
+where
+    T: Display,
+{
+    fn print_node(&self) -> String {
+        format!("{}", self.borrow().val)
+    }
+}
+
+impl<T> BinaryTreeValidator<T> for BareNode<T>
+where
+    T: PartialOrd + Copy,
+{
+    fn val(&self) -> T {
+        self.borrow().val
     }
 }
 
