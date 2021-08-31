@@ -24,6 +24,36 @@ where
         }
         return std::cmp::max(left_depth, right_depth) + 1;
     }
+
+    fn inorder(&self, f: &mut impl FnMut(&Self)) {
+        if let Some(left) = self.left() {
+            left.inorder(f);
+        }
+        f(&self);
+        if let Some(right) = self.right() {
+            right.inorder(f)
+        }
+    }
+
+    fn preorder(&self, f: &mut impl FnMut(&Self)) {
+        f(&self);
+        if let Some(left) = self.left() {
+            left.inorder(f);
+        }
+        if let Some(right) = self.right() {
+            right.inorder(f)
+        }
+    }
+
+    fn postorder(&self, f: &mut impl FnMut(&Self)) {
+        if let Some(left) = self.left() {
+            left.inorder(f);
+        }
+        if let Some(right) = self.right() {
+            right.inorder(f)
+        }
+        f(&self);
+    }
 }
 
 pub trait BinaryTreePrint<T>

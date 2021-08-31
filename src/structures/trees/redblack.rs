@@ -26,7 +26,7 @@ type BareParent<T> = Weak<RefCell<RBNode<T>>>;
 pub type Parent<T> = Option<BareParent<T>>;
 
 #[derive(Debug, Eq, PartialEq, Copy, Clone)]
-enum Color {
+pub enum Color {
     Black,
     Red,
 }
@@ -80,7 +80,7 @@ enum Branch<T> {
     Right(Family<T>),
 }
 
-trait Colored {
+pub trait Colored {
     fn color(&self) -> Color;
 }
 
@@ -99,7 +99,7 @@ impl<T> Colored for BareChild<T> {
     }
 }
 
-trait NodeActions<T>
+pub trait NodeActions<T>
 where
     Self: Sized,
     Self: BinaryTreeUtil + Colored,
@@ -239,6 +239,14 @@ impl<T> RBTree<T>
 where
     T: Eq + PartialOrd + Ord + Debug + Display + Copy,
 {
+    pub fn from<I: IntoIterator<Item = T>>(iter: I) -> Self {
+        let mut result = Self::new();
+        for item in iter {
+            result.insert(item);
+        }
+        result
+    }
+
     pub fn new() -> Self {
         Self { root: None }
     }
@@ -413,6 +421,15 @@ where
         }
         println!("Empty Tree");
     }
+
+    pub fn nodes(&self) -> Vec<BareChild<T>> {
+        let mut nodes = Vec::new();
+        let mut push = |node: &BareChild<T>| nodes.push(node.clone());
+        if let Some(root) = &self.root {
+            root.inorder(&mut push);
+        }
+        nodes
+    }
 }
 
 /* Tree Utils */
@@ -432,7 +449,7 @@ where
     T: Display,
 {
     fn print_node(&self) -> String {
-        format!("{} x {}", self.borrow().val, self.borrow().count,)
+        format!("{} x {}", self.borrow().val, self.borrow().count)
     }
 }
 
@@ -450,14 +467,34 @@ mod tests {
     use super::*;
     use rand::*;
 
-    #[test]
-    fn rb_basic() {
+    fn generate_random_bst() -> RBTree<i32> {
         let mut tree = RBTree::new();
         let mut rng = rand::thread_rng();
-        for _ in 1..=1000 {
+        for _ in 1..=100 {
             let random = rng.gen_range(0..200);
             tree.insert(random);
-            assert!(tree.is_valid_bst())
         }
+        tree
+    }
+
+    #[test]
+    fn rb_basic() {
+        let tree = generate_random_bst();
+        assert!(tree.is_valid_bst());
+    }
+
+    #[test]
+    fn rb_inorder() {
+        let tree = generate_random_bst();
+        let mut out = vec![];
+        let mut test = |node: &BareChild<i32>| {
+            out.push(node.val());
+        };
+        if let Some(root) = tree.root {
+            root.inorder(&mut test);
+        }
+        let mut result = out.clone();
+        result.sort();
+        assert_eq!(out, result);
     }
 }
