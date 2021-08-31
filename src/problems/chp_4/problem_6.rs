@@ -13,10 +13,10 @@ fn smallest<T: Debug>(node: RBChild<T>) -> RBChild<T> {
 
 /// Straightforward check for next value following inorder pattern
 ///
-/// 1. Try to return the smallest element in the "Right" subtree,
-/// 2. Return the parent (if you are the left child of the parent, thus smaller)
-/// 3. Return none;
-pub fn get_next(node: RBChild<i32>) -> RBChild<i32> {
+/// 1. Try to return the smallest element in the "right" subtree,
+/// 2. If not aboce, return first "ancestor" that was the left child of a node;
+/// 3. In the case of right_most child (path from root is all right), then return None
+pub fn find_successor(node: RBChild<i32>) -> RBChild<i32> {
     if let Some(node) = &node {
         let right = node.borrow().right.as_ref().map(|n| n.clone());
         let small_right_st = smallest(right);
@@ -88,7 +88,7 @@ mod tests {
         let nodes = tree.nodes();
         let node_pos = nodes.binary_search_by(|node| 3.cmp(&node.val())).unwrap();
         let random_node = nodes[node_pos].clone();
-        let next = get_next(Some(random_node)).unwrap();
+        let next = find_successor(Some(random_node)).unwrap();
         assert_eq!(next.val(), 4);
     }
 
@@ -103,7 +103,7 @@ mod tests {
         let nodes = tree.nodes();
         let node_pos = nodes.binary_search_by(|node| node.val().cmp(&0)).unwrap();
         let random_node = nodes[node_pos].clone();
-        let next = get_next(Some(random_node)).unwrap();
+        let next = find_successor(Some(random_node)).unwrap();
         assert_eq!(next.val(), 1);
     }
 
@@ -113,7 +113,7 @@ mod tests {
             let items = generate_random_vec(size);
             let mut tree = RBTree::from(items.clone());
             let (node, expected_value) = prepare_run(&mut tree, items);
-            let next = get_next(node);
+            let next = find_successor(node);
             if let Some(next) = next {
                 assert_eq!(next.val(), expected_value.unwrap());
             } else {
