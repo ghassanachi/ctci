@@ -98,7 +98,6 @@ mod tests {
         items.sort();
         items.dedup();
 
-        println!("{:?}", items);
         let tree = RBTree::from(items);
         let nodes = tree.nodes();
         let node_pos = nodes.binary_search_by(|node| node.val().cmp(&0)).unwrap();
