@@ -20,7 +20,7 @@ pub struct RBTree<T> {
     pub root: Child<T>,
 }
 
-type BareChild<T> = Rc<RefCell<RBNode<T>>>;
+pub type BareChild<T> = Rc<RefCell<RBNode<T>>>;
 pub type Child<T> = Option<BareChild<T>>;
 type BareParent<T> = Weak<RefCell<RBNode<T>>>;
 pub type Parent<T> = Option<BareParent<T>>;
