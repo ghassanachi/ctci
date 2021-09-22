@@ -11,7 +11,6 @@ fn has_subtree_helper<T: Eq + Debug>(root: TreeNodeRef<T>, sub_root: TreeNodeRef
     }
 
     let sub_root = sub_root.unwrap();
-    let mut potential_nodes: Vec<TreeNodeRef<T>> = Vec::new();
     let mut dfs_stack = vec![root.as_ref().map(|n| n.clone())];
     while let Some(element) = dfs_stack.pop() {
         if element.is_none() {
@@ -19,17 +18,14 @@ fn has_subtree_helper<T: Eq + Debug>(root: TreeNodeRef<T>, sub_root: TreeNodeRef
         }
         let node = element.unwrap();
         if node.borrow().val == sub_root.borrow().val {
-            potential_nodes.push(Some(node.clone()));
+            if is_subtree(Some(sub_root.clone()), Some(node.clone())) {
+                return true;
+            }
         }
         dfs_stack.push(node.left());
         dfs_stack.push(node.right());
     }
 
-    for node in potential_nodes {
-        if is_subtree(Some(sub_root.clone()), node) {
-            return true;
-        }
-    }
     false
 }
 
