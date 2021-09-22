@@ -120,6 +120,7 @@ where
     fn is_parent(&self, node: Self) -> bool;
     fn swap_colors(&self, node: Self);
     fn increment_count(&self);
+    fn count(&self) -> u32;
 }
 
 impl<T> NodeActions<T> for BareChild<T> {
@@ -233,11 +234,15 @@ impl<T> NodeActions<T> for BareChild<T> {
     fn increment_count(&self) {
         self.borrow_mut().count += 1;
     }
+
+    fn count(&self) -> u32 {
+        self.borrow().count
+    }
 }
 
 impl<T> RBTree<T>
 where
-    T: Eq + PartialOrd + Ord + Debug + Display + Copy,
+    T: Eq + PartialOrd + Ord + Display + Copy,
 {
     pub fn from<I: IntoIterator<Item = T>>(iter: I) -> Self {
         let mut result = Self::new();
@@ -277,10 +282,12 @@ where
         self.root.as_ref().map(|n| n.clone())
     }
 
-    pub fn insert(&mut self, val: T) {
+    pub fn insert(&mut self, val: T) -> Child<T> {
         let node = self.insert_node(val);
+        let node_out = node.as_ref().map(|n| n.clone());
         let state = self.balance_state(node.unwrap());
         self.balance(state);
+        node_out
     }
 
     fn balance_state(&self, node: BareChild<T>) -> BalanceState<T> {

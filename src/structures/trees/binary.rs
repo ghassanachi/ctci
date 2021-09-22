@@ -1,5 +1,6 @@
 use crate::structures::{BinaryTreePrint, BinaryTreeUtil, BinaryTreeValidator};
 use std::cell::RefCell;
+use std::cmp::Ordering;
 use std::fmt::Display;
 use std::rc::Rc;
 
@@ -38,6 +39,13 @@ impl<T> Node<T> {
 }
 
 impl<T> BinaryTree<T> {
+    pub fn new() -> Self {
+        Self { root: None }
+    }
+    pub fn new_node(val: T) -> NodeRef<T> {
+        Some(Rc::new(RefCell::new(Node::new(val))))
+    }
+
     fn build_helper(src: &[Option<T>], cur: &mut usize) -> NodeRef<T>
     where
         T: Copy,
@@ -56,6 +64,34 @@ impl<T> BinaryTree<T> {
             *cur += 1;
             None
         }
+    }
+
+    pub fn insert(&mut self, val: T) -> NodeRef<T>
+    where
+        T: Copy + Ord + Eq,
+    {
+        let mut cursor = self.root.as_ref().map(|n| n.clone());
+        let new_node = Self::new_node(val);
+        while let Some(node) = cursor {
+            match val.cmp(&node.val()) {
+                Ordering::Less => {
+                    if node.left().is_none() {
+                        node.borrow_mut().left = new_node.as_ref().map(|n| n.clone());
+                        return new_node;
+                    }
+                    cursor = node.left();
+                }
+                _ => {
+                    if node.right().is_none() {
+                        node.borrow_mut().right = new_node.as_ref().map(|n| n.clone());
+                        return new_node;
+                    }
+                    cursor = node.right();
+                }
+            }
+        }
+        self.root = Self::new_node(val);
+        self.root.as_ref().map(|n| n.clone())
     }
 
     pub fn build(src: &[Option<T>]) -> Self
