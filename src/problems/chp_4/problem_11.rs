@@ -119,7 +119,6 @@ mod tests {
             counts[random] += 1;
         }
         println!("{:?}", counts);
-        assert!(false)
     }
 
     #[test]
@@ -134,7 +133,6 @@ mod tests {
             counts[random] += 1;
         }
         println!("{:?}", counts); // 4 and 2 are expected to be twice as likely
-        assert!(false)
     }
 
     #[test]
