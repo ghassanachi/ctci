@@ -1,5 +1,4 @@
 use crate::structures::TreeNodeRef;
-use std::collections::HashSet;
 use std::fmt::Debug;
 use std::hash::Hash;
 
@@ -77,6 +76,7 @@ mod tests {
 
     use super::*;
     use crate::structures::BinaryTree;
+    use std::collections::HashSet;
 
     #[test]
     fn bst_weave_1() {
@@ -102,7 +102,6 @@ mod tests {
     #[test]
     fn bst_sequences_3() {
         let tree = BinaryTree::build(&vec![Some(2), Some(3), None, Some(12), None, None, Some(4)]);
-        tree.print();
         let result: Vec<Vec<_>> = bst_sequences(tree.root).into_iter().collect();
         assert_eq!(result.len(), 3)
     }
@@ -126,7 +125,6 @@ mod tests {
             None,
             None,
         ]);
-        tree.print();
         let result: Vec<Vec<_>> = bst_sequences(tree.root).into_iter().collect();
         let unique: HashSet<Vec<_>> = result.clone().into_iter().collect();
         assert_eq!(result.len(), 80);

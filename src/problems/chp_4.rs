@@ -7,3 +7,5 @@ pub mod problem_6;
 pub mod problem_7;
 pub mod problem_8;
 pub mod problem_9;
+// space to prevent auto sort
+pub mod problem_10;
