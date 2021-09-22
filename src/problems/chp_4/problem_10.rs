@@ -2,23 +2,23 @@ use crate::structures::BinaryTreeUtil;
 use crate::structures::{BinaryTree, TreeNodeRef};
 use std::fmt::Debug;
 
-fn has_subtree_helper<T: Eq + Debug>(root: TreeNodeRef<T>, sub_root: TreeNodeRef<T>) -> bool {
-    match (&root, &sub_root) {
+fn has_subtree_helper<T: Eq + Debug>(root: &TreeNodeRef<T>, sub_root: &TreeNodeRef<T>) -> bool {
+    match (root, sub_root) {
         (None, None) => return true,
         (Some(_), None) => return true,
         (None, Some(_)) => return false,
         _ => {}
     }
 
-    let sub_root = sub_root.unwrap();
+    let sub_root_node = sub_root.as_deref().unwrap();
     let mut dfs_stack = vec![root.as_ref().map(|n| n.clone())];
     while let Some(element) = dfs_stack.pop() {
         if element.is_none() {
             continue;
         }
         let node = element.unwrap();
-        if node.borrow().val == sub_root.borrow().val {
-            if is_subtree(Some(sub_root.clone()), Some(node.clone())) {
+        if node.borrow().val == sub_root_node.borrow().val {
+            if is_subtree(sub_root, &Some(node.clone())) {
                 return true;
             }
         }
@@ -29,7 +29,7 @@ fn has_subtree_helper<T: Eq + Debug>(root: TreeNodeRef<T>, sub_root: TreeNodeRef
     false
 }
 
-fn is_subtree<T: Eq + Debug>(root: TreeNodeRef<T>, node: TreeNodeRef<T>) -> bool {
+fn is_subtree<T: Eq + Debug>(root: &TreeNodeRef<T>, node: &TreeNodeRef<T>) -> bool {
     match (root, node) {
         (Some(_), None) => return false,
         (None, Some(_)) => return false,
@@ -37,15 +37,16 @@ fn is_subtree<T: Eq + Debug>(root: TreeNodeRef<T>, node: TreeNodeRef<T>) -> bool
             if root.borrow().val != node.borrow().val {
                 return false;
             }
-            return is_subtree(root.left(), node.left()) && is_subtree(root.right(), node.right());
+            return is_subtree(&root.left(), &node.left())
+                && is_subtree(&root.right(), &node.right());
         }
         (None, None) => return true,
     }
 }
 
 pub fn has_subtree<T: Eq + Debug>(tree: &BinaryTree<T>, subtree: &BinaryTree<T>) -> bool {
-    let tree_node = tree.root.as_ref().map(|n| n.clone());
-    let subtree_node = subtree.root.as_ref().map(|n| n.clone());
+    let tree_node = &tree.root;
+    let subtree_node = &subtree.root;
     has_subtree_helper(tree_node, subtree_node)
 }
 
