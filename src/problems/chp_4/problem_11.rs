@@ -105,7 +105,7 @@ mod tests {
 
     use super::*;
 
-    /// Since the test are random I am just asserting true and printing out results.
+    /// Since the test are rng dependent I am just asserting true and printing out results.
     /// Not sure what best practice is here
     #[test]
     fn random_tree_1() {
@@ -121,6 +121,7 @@ mod tests {
         println!("{:?}", counts);
     }
 
+    /// 4 and 2 are expected to be twice as likely since they both appear twice in the tree
     #[test]
     fn random_tree_2() {
         let mut tree = BinaryTree::new() as RandomTree<u32>;
@@ -132,7 +133,7 @@ mod tests {
             let random = tree.get_random().expect("tree is not empty") as usize;
             counts[random] += 1;
         }
-        println!("{:?}", counts); // 4 and 2 are expected to be twice as likely
+        println!("{:?}", counts);
     }
 
     #[test]
