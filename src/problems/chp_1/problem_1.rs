@@ -1,4 +1,5 @@
 use std::collections::HashSet;
+
 pub fn all_chars_unique_part_a(s: &str) -> bool {
     let mut char_set: HashSet<char> = HashSet::new();
 
