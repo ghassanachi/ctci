@@ -9,12 +9,6 @@ fn count_bits(num: u32) -> u8 {
     len
 }
 
-fn update_bit(num: &mut u32, position: u8, val: bool) {
-    let value = if val { 1 } else { 0 };
-    let mask = !(1 << position);
-    *num = (*num & mask) | (value << position)
-}
-
 pub fn get_bit(num: u32, position: u8) -> bool {
     return (num & (1 << position)) != 0;
 }
@@ -22,10 +16,22 @@ pub fn get_bit(num: u32, position: u8) -> bool {
 pub fn bit_num_insertion(n: &mut u32, m: u32, i: u8, j: u8) {
     assert!(i < j, "i should be smaller than j");
     assert!(count_bits(m) <= j - i, "j - i != bit_len(m)");
-    for position in i..=j {
-        let bit = get_bit(m, position - i);
-        update_bit(n, position, bit);
-    }
+
+    // create mask of all 0's up to j (ie: 11110000)
+    let top_mask = !0 << j - 1;
+
+    // create mask of all 1's up to i (ie: 00001111)
+    let bottom_mask = (1 << i) - 1;
+
+    let mask = top_mask | bottom_mask;
+
+    // Clear bits from i to j;
+    *n = *n & mask;
+
+    // Shift m to i;
+    let m = m << i;
+
+    *n = *n | m
 }
 
 #[cfg(test)]
@@ -34,14 +40,11 @@ mod tests {
 
     #[test]
     fn bit_helpers_test() {
-        let mut num = 6u32;
+        let num = 6u32;
         assert!(!get_bit(num, 0));
         assert!(get_bit(num, 1));
         assert!(get_bit(num, 2));
         assert!(!get_bit(num, 3));
-        update_bit(&mut num, 0, true);
-        assert!(get_bit(num, 0));
-        assert_eq!(num, 7);
     }
 
     /// Example from the ctci book
@@ -76,6 +79,5 @@ mod tests {
         let j = 17;
         bit_num_insertion(&mut n, m, i, j);
         assert_eq!(n, m << 15);
-        assert!(n != m << 18);
     }
 }
