@@ -4,7 +4,6 @@ pub enum BinStrErr {
     CannotRepresent,
 }
 
-/// Slow but easy implementation
 pub fn binary_to_string(mut num: f64) -> Result<String, BinStrErr> {
     if num < 0.0 || num >= 1.0 {
         return Err(BinStrErr::OutOfBounds);
