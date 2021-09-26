@@ -40,6 +40,7 @@ mod tests {
         assert_eq!(flip_to_win(0b1110111), 7);
         assert_eq!(flip_to_win(0b111011101111), 8);
         assert_eq!(flip_to_win(0b1110111001111), 7);
+        assert_eq!(flip_to_win(0b000000010000000), 2);
         assert_eq!(flip_to_win(0), 1);
     }
 }
