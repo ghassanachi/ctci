@@ -1,4 +1,4 @@
-/// Slow but easy
+/// Slow but easy implementation
 fn count_bits(num: u32) -> u8 {
     let mut len = 0u8;
     for position in 0..31 {
