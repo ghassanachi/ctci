@@ -1,4 +1,3 @@
-#[allow(dead_code)]
 fn get_bit(num: u32, position: u8) -> bool {
     return (num & (1 << position)) != 0;
 }
