@@ -1,4 +1,4 @@
-use crate::structures::*;
+use crate::structures::{NodeRef, SinglyLinkedList};
 use std::rc::Rc;
 
 pub fn find_kth_last_element<T: Clone>(list: &SinglyLinkedList<T>, k: usize) -> Option<T> {

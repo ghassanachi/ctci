@@ -1,4 +1,4 @@
-use crate::structures::*;
+use crate::structures::{Node, NodeRef, SinglyLinkedList};
 use std::cell::RefCell;
 use std::rc::Rc;
 
@@ -32,7 +32,10 @@ pub fn sum_lists_backwards(
     res
 }
 
-fn _recurse(l1: &Option<NodeRef<i32>>, l2: &Option<NodeRef<i32>>) -> Option<(i32, NodeRef<i32>)> {
+fn sum_list_helper(
+    l1: &Option<NodeRef<i32>>,
+    l2: &Option<NodeRef<i32>>,
+) -> Option<(i32, NodeRef<i32>)> {
     match (l1, l2) {
         (Some(l1_node), Some(l2_node)) => {
             let val = l1_node.borrow().data + l2_node.borrow().data;
@@ -40,7 +43,7 @@ fn _recurse(l1: &Option<NodeRef<i32>>, l2: &Option<NodeRef<i32>>) -> Option<(i32
             let l2_node = Rc::clone(l2_node);
             let mut remainder = 0;
             let mut next: Option<NodeRef<i32>> = None;
-            if let Some((r, n)) = _recurse(&l1_node.borrow().next, &l2_node.borrow().next) {
+            if let Some((r, n)) = sum_list_helper(&l1_node.borrow().next, &l2_node.borrow().next) {
                 remainder = r;
                 next = Some(n);
             }
@@ -73,7 +76,7 @@ pub fn sum_lists_forward(
         }
     }
 
-    if let Some((remainder, head)) = _recurse(&l1.head, &l2.head) {
+    if let Some((remainder, head)) = sum_list_helper(&l1.head, &l2.head) {
         res.head = Some(head);
         if remainder != 0 {
             res.prepend(remainder);

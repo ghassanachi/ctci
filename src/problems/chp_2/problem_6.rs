@@ -1,4 +1,4 @@
-use crate::structures::*;
+use crate::structures::{NodeRef, SinglyLinkedList};
 use std::rc::Rc;
 
 pub fn reverse<T>(head: &mut Option<NodeRef<T>>) -> Option<NodeRef<T>> {

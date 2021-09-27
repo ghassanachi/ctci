@@ -1,5 +1,4 @@
 use crate::structures::{BinaryTree, BinaryTreeUtil, TreeNodeRef};
-use std::cmp::max;
 
 pub fn is_balanced<T>(tree: BinaryTree<T>) -> bool {
     helper(tree.root).is_some()
@@ -11,7 +10,7 @@ fn helper<T>(node: TreeNodeRef<T>) -> Option<i32> {
         let r_balanced = helper(node.right());
         return match (l_balanced, r_balanced) {
             (Some(left_depth), Some(right_depth)) if (left_depth - right_depth) < 2 => {
-                Some(max(left_depth, right_depth) + 1)
+                Some(left_depth.max(right_depth) + 1)
             }
             _ => None,
         };

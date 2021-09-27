@@ -1,4 +1,4 @@
-use crate::structures::*;
+use crate::structures::{LinkedList, SinglyLinkedList};
 use std::collections::HashSet;
 use std::hash::Hash;
 

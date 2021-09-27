@@ -1,4 +1,4 @@
-use crate::structures::*;
+use crate::structures::{NodeRef, SinglyLinkedList};
 use std::fmt::Debug;
 use std::rc::Rc;
 

@@ -1,4 +1,4 @@
-use crate::structures::*;
+use crate::structures::NodeRef;
 use std::fmt::Debug;
 use std::rc::Rc;
 
@@ -32,6 +32,7 @@ pub fn delete_middle_node<T: Clone + Default + Debug>(node: Option<NodeRef<T>>) 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::structures::SinglyLinkedList;
 
     #[test]
     fn delete_middle_node_1() {

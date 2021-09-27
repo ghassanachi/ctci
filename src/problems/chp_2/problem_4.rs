@@ -1,4 +1,4 @@
-use crate::structures::*;
+use crate::structures::{Node, SinglyLinkedList};
 use std::cell::RefCell;
 use std::fmt::{Debug, Display};
 use std::mem;

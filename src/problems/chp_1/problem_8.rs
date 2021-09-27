@@ -1,4 +1,5 @@
 use std::collections::HashSet;
+
 pub fn zero_matrix(matrix: &mut [Vec<u32>]) {
     let mut col_set = HashSet::new();
     let mut row_set = HashSet::new();
