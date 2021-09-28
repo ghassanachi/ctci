@@ -64,15 +64,20 @@ pub fn draw_line<const N: usize>(
 ) {
     let row_start = width * y;
     let row = &mut screen[row_start + (x1 / 8)..=row_start + (x2 / 8)];
+    let first_mask = !0 >> (x1 % 8) as u8;
+    let last_mask = !(!0 >> ((x2 + 1) % 8));
 
     if let Some(first) = row.first_mut() {
-        let first_mask = !0 >> (x1 % 8) as u8;
-        *first = *first | first_mask;
+        // Early return since x1 and xy are in the same byte
+        if x2 / 8 == x1 / 8 {
+            *first = last_mask & first_mask;
+            return;
+        }
+        *first = first_mask;
     }
 
     if let Some(last) = row.last_mut() {
-        let last_mask = !(!0 >> ((x2 + 1) % 8));
-        *last = *last | last_mask;
+        *last = last_mask;
     }
 
     if row.len() > 2 {
@@ -97,6 +102,17 @@ mod tests {
 
     #[test]
     fn draw_line_2() {
+        let width = 3;
+        let mut screen = Screen::<6>::new(width);
+        draw_line(&mut screen, width, 8, 8, 0);
+        assert_eq!(screen.array, [0, 0b1000_0000, 0, 0, 0, 0]);
+        let mut screen = Screen::<6>::new(width);
+        draw_line(&mut screen, width, 10, 12, 0);
+        assert_eq!(screen.array, [0, 0b0011_1000, 0, 0, 0, 0]);
+    }
+
+    #[test]
+    fn draw_line_3() {
         let width = 7;
         let mut screen = Screen::<49>::new(width);
         draw_line(&mut screen, width, 0, 56, 3);
@@ -107,7 +123,7 @@ mod tests {
     }
 
     #[test]
-    fn draw_line_3() {
+    fn draw_line_4() {
         let width = 16;
         let mut screen = Screen::<256>::new(width);
         draw_line(&mut screen, width, 26, 110, 8);
