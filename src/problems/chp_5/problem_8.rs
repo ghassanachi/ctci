@@ -7,7 +7,7 @@ pub struct Screen<const N: usize> {
 }
 
 impl<const N: usize> Screen<N> {
-    fn new(width: usize) -> Self {
+    pub fn new(width: usize) -> Self {
         assert!(N % width == 0);
         Screen {
             array: [0; N],
