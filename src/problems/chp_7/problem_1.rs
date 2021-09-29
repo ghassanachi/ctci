@@ -23,6 +23,7 @@ pub struct Player {
     pub name: String,
     pub hand: Vec<Card>,
     status: PlayerStatus,
+    is_dealer: bool,
 }
 
 pub struct Deck(Vec<Card>);
@@ -101,6 +102,7 @@ impl BlackJack {
                     .read_line(&mut input)
                     .expect("Could not read line");
                 input.pop();
+
                 match input.trim() {
                     "h" | "H" => {
                         let card = self.deck.draw();
@@ -109,12 +111,12 @@ impl BlackJack {
                         let min = totals.iter().min().unwrap();
                         if min > &21 {
                             println!("{} Busted with {}", player.name, min);
-                            player.status = PlayerStatus::Busted;
+                            player.bust();
                         }
                     }
                     "s" | "S" => {
                         println!("{} is staying at {}", player.name, player.best_total());
-                        player.status = PlayerStatus::Staying;
+                        player.stay();
                     }
                     "q" | "Q" => {
                         println!("Thanks for playing!");
@@ -126,16 +128,16 @@ impl BlackJack {
         }
 
         while self.dealer.status == PlayerStatus::Playing {
-            println!("\n{}\n", self.dealer.dealer_to_string());
+            println!("\n{}\n", self.dealer.to_string());
 
-            let dealer_val = self.dealer.dealer_total();
+            let dealer_val = self.dealer.best_total();
 
             if dealer_val > 21 {
                 println!("Dealer Busted!");
-                self.dealer.status = PlayerStatus::Busted;
+                self.dealer.bust();
             } else if dealer_val >= 17 {
                 println!("Dealer Staying!");
-                self.dealer.status = PlayerStatus::Staying;
+                self.dealer.stay();
                 break;
             } else {
                 let card = self.deck.draw();
@@ -160,7 +162,7 @@ impl BlackJack {
             return;
         }
 
-        let dealer_val = self.dealer.dealer_total();
+        let dealer_val = self.dealer.best_total();
         let winners: Vec<_> = self
             .players
             .iter()
@@ -192,6 +194,7 @@ impl Player {
             name,
             hand: Vec::new(),
             status: PlayerStatus::Playing,
+            is_dealer: false,
         }
     }
 
@@ -200,10 +203,11 @@ impl Player {
             name: String::from("Dealer"),
             hand: Vec::new(),
             status: PlayerStatus::Playing,
+            is_dealer: true,
         }
     }
 
-    pub fn dealer_total(&self) -> u8 {
+    fn dealer_total(&self) -> u8 {
         let mut has_ace = false;
         let mut total = 0;
         for card in &self.hand {
@@ -240,6 +244,9 @@ impl Player {
     }
 
     pub fn best_total(&self) -> u8 {
+        if self.is_dealer {
+            return self.dealer_total();
+        }
         let totals = self.possible_totals();
         let mut best = 0;
         for total in totals {
@@ -259,7 +266,18 @@ impl Player {
         self.possible_totals()
     }
 
+    fn bust(&mut self) {
+        self.status = PlayerStatus::Busted
+    }
+
+    fn stay(&mut self) {
+        self.status = PlayerStatus::Staying
+    }
+
     pub fn to_string(&self) -> String {
+        if self.is_dealer {
+            return self.dealer_to_string();
+        }
         let hand = self
             .hand
             .iter()
@@ -278,7 +296,7 @@ impl Player {
         )
     }
 
-    pub fn dealer_to_string(&self) -> String {
+    fn dealer_to_string(&self) -> String {
         let hand = self
             .hand
             .iter()
