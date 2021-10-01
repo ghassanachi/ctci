@@ -38,9 +38,9 @@ fn dfs_grid<const N: usize, const M: usize>(
     path: &mut Vec<Direction>,
 ) -> bool {
     assert!(grid.len() > 0, "grid should not be empty");
-    let (x, y) = position;
+    let (row, col) = position;
 
-    if x + 1 == M && y + 1 == N {
+    if row + 1 == M && col + 1 == N {
         return true;
     }
 
@@ -52,30 +52,30 @@ fn dfs_grid<const N: usize, const M: usize>(
 
     blocked.insert(position);
 
-    if x + 1 < M {
+    if row + 1 < M {
         path.push(Direction::Right);
-        if dfs_grid(grid, blocked, (x + 1, y), path) {
+        if dfs_grid(grid, blocked, (row + 1, col), path) {
             return true;
         }
     }
 
-    if y + 1 < N {
+    if col + 1 < N {
         path.push(Direction::Down);
-        if dfs_grid(grid, blocked, (x, y + 1), path) {
+        if dfs_grid(grid, blocked, (row, col + 1), path) {
             return true;
         }
     }
 
-    if x >= 1 {
+    if row >= 1 {
         path.push(Direction::Left);
-        if dfs_grid(grid, blocked, (x - 1, y), path) {
+        if dfs_grid(grid, blocked, (row - 1, col), path) {
             return true;
         }
     }
 
-    if y >= 1 {
+    if col >= 1 {
         path.push(Direction::Up);
-        if dfs_grid(grid, blocked, (x, y - 1), path) {
+        if dfs_grid(grid, blocked, (row, col - 1), path) {
             return true;
         }
     }
