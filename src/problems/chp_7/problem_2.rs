@@ -1,3 +1,9 @@
+/// After looking at the solution I realized I forgot to include the "escalate" ability.
+/// I might revisit this in the future and also add a "call_queue", but to be honest I the OOP
+/// section of the book is not really what I was looking to practice.
+///
+/// Additionally OOP interviews don't ususally require full implementations, but rather a sketch of
+/// the overall architecture, so this is of low priority for me
 use std::collections::VecDeque;
 
 pub struct CallCenter {
@@ -52,15 +58,15 @@ impl CallCenter {
         }
     }
 
-    pub fn dispatch_call(&mut self) -> Result<Call, String> {
-        if let Some(respondent) = self.respondents.pop_front() {
-            return Ok(Call::RespondentCall(respondent));
+    pub fn dispatch_call(&mut self, role: Role) -> Result<Call, String> {
+        if let (false, true) = (self.respondents.is_empty(), role == Role::Respondent) {
+            return Ok(Call::RespondentCall(self.respondents.pop_front().unwrap()));
         }
-        if let Some(manager) = self.managers.pop_front() {
-            return Ok(Call::ManagerCall(manager));
+        if let (false, true) = (self.managers.is_empty(), role <= Role::Manager) {
+            return Ok(Call::ManagerCall(self.managers.pop_front().unwrap()));
         }
-        if let Some(director) = self.directors.pop_front() {
-            return Ok(Call::DirectorCall(director));
+        if let (false, true) = (self.directors.is_empty(), role <= Role::Director) {
+            return Ok(Call::DirectorCall(self.directors.pop_front().unwrap()));
         }
         Err(String::from("No one is available"))
     }
@@ -74,11 +80,18 @@ impl CallCenter {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[repr(u8)]
 pub enum Role {
-    Respondent,
-    Manager,
-    Director,
+    Respondent = 0,
+    Manager = 1,
+    Director = 2,
+}
+
+impl Default for Role {
+    fn default() -> Self {
+        Self::Respondent
+    }
 }
 
 pub struct Respondent {
@@ -173,15 +186,15 @@ mod tests {
     fn call_center_1() {
         let mut call_center = CallCenter::from_iters(["James"], ["George"], ["Patrick"]);
 
-        let first_call = call_center.dispatch_call().unwrap();
+        let first_call = call_center.dispatch_call(Default::default()).unwrap();
         assert_eq!(first_call.name(), "James");
         assert_eq!(first_call.role(), Role::Respondent);
 
-        let second_call = call_center.dispatch_call().unwrap();
+        let second_call = call_center.dispatch_call(Default::default()).unwrap();
         assert_eq!(second_call.name(), "George");
         assert_eq!(second_call.role(), Role::Manager);
 
-        let third_call = call_center.dispatch_call().unwrap();
+        let third_call = call_center.dispatch_call(Default::default()).unwrap();
         assert_eq!(third_call.name(), "Patrick");
         assert_eq!(third_call.role(), Role::Director);
     }
@@ -190,21 +203,21 @@ mod tests {
     fn call_center_2() {
         let mut call_center = CallCenter::from_iters(["James"], ["George"], ["Patrick"]);
 
-        let first_call = call_center.dispatch_call().unwrap();
-        assert_eq!(first_call.name(), "James");
-        assert_eq!(first_call.role(), Role::Respondent);
+        let first_call = call_center.dispatch_call(Role::Manager).unwrap();
+        assert_eq!(first_call.name(), "George");
+        assert_eq!(first_call.role(), Role::Manager);
 
-        let second_call = call_center.dispatch_call().unwrap();
-        assert_eq!(second_call.name(), "George");
-        assert_eq!(second_call.role(), Role::Manager);
+        let second_call = call_center.dispatch_call(Default::default()).unwrap();
+        assert_eq!(second_call.name(), "James");
+        assert_eq!(second_call.role(), Role::Respondent);
 
         call_center.end_call(first_call);
 
-        let third_call = call_center.dispatch_call().unwrap();
-        assert_eq!(third_call.name(), "James");
-        assert_eq!(third_call.role(), Role::Respondent);
+        let third_call = call_center.dispatch_call(Default::default()).unwrap();
+        assert_eq!(third_call.name(), "George");
+        assert_eq!(third_call.role(), Role::Manager);
 
-        let fourth_call = call_center.dispatch_call().unwrap();
+        let fourth_call = call_center.dispatch_call(Default::default()).unwrap();
         assert_eq!(fourth_call.name(), "Patrick");
         assert_eq!(fourth_call.role(), Role::Director);
     }
