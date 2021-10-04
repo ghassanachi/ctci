@@ -1,65 +1,45 @@
 pub fn magic_index_unique(arr: &[i64]) -> Option<usize> {
-    match arr.len() {
-        0 => None,
-        _ => magic_index_unique_helper(arr, 0, arr.len() - 1),
-    }
+    magic_index_unique_helper(arr, 0, (arr.len() as i64) - 1)
 }
 
-fn magic_index_unique_helper(arr: &[i64], low: usize, high: usize) -> Option<usize> {
-    if low == high && arr[low] != low as i64 {
+fn magic_index_unique_helper(arr: &[i64], low: i64, high: i64) -> Option<usize> {
+    if low > high {
         return None;
     }
     let mid = (high + low) / 2;
-    if arr[mid] == mid as i64 {
-        return Some(mid);
+    match arr[mid as usize].cmp(&mid) {
+        std::cmp::Ordering::Less => magic_index_unique_helper(arr, mid + 1, high),
+        std::cmp::Ordering::Equal => Some(mid as usize),
+        std::cmp::Ordering::Greater => magic_index_unique_helper(arr, low, mid - 1),
     }
-
-    if arr[mid] > mid as i64 {
-        return magic_index_unique_helper(arr, low, mid);
-    }
-    return magic_index_unique_helper(arr, mid + 1, high);
 }
 
 pub fn magic_index(arr: &[i64]) -> Option<usize> {
-    match arr.len() {
-        0 => None,
-        _ => magic_index_helper(arr, 0, arr.len() - 1),
-    }
+    magic_index_helper(arr, 0, (arr.len() as i64) - 1)
 }
 
-fn magic_index_helper(arr: &[i64], low: usize, high: usize) -> Option<usize> {
-    println!("low: {} high: {}", low, high);
-    if low == high && arr[low] != low as i64 {
+fn magic_index_helper(arr: &[i64], low: i64, high: i64) -> Option<usize> {
+    if low > high {
         return None;
     }
 
-    let mid = (high + low) / 2;
-    if arr[mid] == mid as i64 {
-        return Some(mid);
+    let mid_index = (high + low) / 2;
+    let mid_val = arr[mid_index as usize];
+    if mid_val == mid_index {
+        return Some(mid_index as usize);
     }
 
-    if arr[mid] > mid as i64 {
-        if let Some(val) = magic_index_helper(arr, low, mid) {
-            return Some(val);
-        }
-        if let Some(val) = magic_index_helper(arr, mid + 1, arr[mid] as usize) {
-            return Some(val);
-        }
-        return None;
-    }
-
-    if let Some(val) = magic_index_helper(arr, mid + 1, high) {
+    // Search left side from up to the min of the previous index or the mid value index if smaller.
+    let left_end = mid_val.min(mid_index - 1);
+    if let Some(val) = magic_index_helper(arr, low, left_end) {
         return Some(val);
     }
 
-    // If the number is negative then there is no need to check if it is magic since that would be
-    // impossible
-    if arr[mid].is_positive() {
-        if let Some(val) = magic_index_helper(arr, arr[mid] as usize, mid) {
-            return Some(val);
-        }
+    // Search right side from next index or the mid value index if it is bigger.
+    let right_start = mid_val.max(mid_index + 1);
+    if let Some(val) = magic_index_helper(arr, right_start, high) {
+        return Some(val);
     }
-
     None
 }
 
