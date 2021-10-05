@@ -1,43 +1,63 @@
+pub fn permutation_with_dups<T: AsRef<str>>(input: T) -> Vec<String> {
+    let input = input.as_ref();
 
-pub fn hanoi_tower(num_disk: usize) -> (Vec<usize>, Vec<usize>, Vec<usize>) {
-    let mut source: Vec<usize> = (0..num_disk).rev().collect();
-    let mut buffer: Vec<usize> = Vec::with_capacity(num_disk);
-    let mut target: Vec<usize> = Vec::with_capacity(num_disk);
-    hanoi_tower_helper(source.len(), &mut source, &mut target, &mut buffer);
-    (source, buffer, target)
-}
-
-fn hanoi_tower_helper(
-    n: usize,
-    source: &mut Vec<usize>,
-    target: &mut Vec<usize>,
-    buffer: &mut Vec<usize>,
-) {
-    if n > 0 {
-        hanoi_tower_helper(n - 1, source, buffer, target);
-        target.push(source.pop().unwrap());
-        hanoi_tower_helper(n - 1, buffer, target, source);
+    if input.len() == 0 {
+        return Vec::new();
     }
+
+    if input.len() == 1 {
+        return vec![input.chars().nth(0).unwrap().to_string()];
+    }
+
+    let mut permutations: Vec<String> = Vec::new();
+    for (i, cur_char) in input.chars().enumerate() {
+        let without_cur = format!("{}{}", input[..i].to_string(), input[i + 1..].to_string());
+        permutation_with_dups(without_cur)
+            .drain(..)
+            .for_each(|mut perm| {
+                perm.push(cur_char);
+                permutations.push(perm);
+            })
+    }
+    permutations
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::collections::HashSet;
+    use std::iter::FromIterator;
 
-    fn is_sorted<T>(data: &[T]) -> bool
-    where
-        T: Ord,
-    {
-        data.windows(2).all(|w| w[0] <= w[1])
+    #[test]
+    fn permutation_with_dups_1() {
+        let mut permutations = permutation_with_dups("tes");
+        permutations.sort();
+        let mut expected = vec!["tes", "tse", "ets", "est", "set", "ste"];
+        expected.sort();
+        assert_eq!(permutations, expected);
     }
 
     #[test]
-    fn tower_of_hanoi_1() {
-        let (source, buffer, mut target) = hanoi_tower(8);
-        assert!(source.is_empty());
-        assert!(buffer.is_empty());
-        assert_eq!(target.len(), 8);
-        target.reverse();
-        assert!(is_sorted(&target));
+    fn permutation_with_dups_2() {
+        let permutations = permutation_with_dups("");
+        let set: HashSet<&String> = HashSet::from_iter(&permutations);
+        assert_eq!(permutations.len(), 0);
+        assert_eq!(set.len(), permutations.len());
+    }
+
+    #[test]
+    fn permutation_with_dups_3() {
+        let permutations = permutation_with_dups("tesx");
+        let set: HashSet<&String> = HashSet::from_iter(&permutations);
+        assert_eq!(permutations.len(), 24);
+        assert_eq!(set.len(), permutations.len());
+    }
+
+    #[test]
+    fn permutation_with_dups_4() {
+        let permutations = permutation_with_dups("sampling");
+        let set: HashSet<&String> = HashSet::from_iter(&permutations);
+        assert_eq!(permutations.len(), 40320);
+        assert_eq!(set.len(), permutations.len());
     }
 }
