@@ -3,32 +3,12 @@ use std::fmt::Display;
 #[derive(Debug, Clone, Copy)]
 pub struct QueenBoard<const N: usize> {
     board: [[Piece; N]; N],
-    can_place: [[bool; N]; N],
-}
-
-struct QueenPlacement {
-    position: (usize, usize),
-    blocked: Vec<(usize, usize)>,
-}
-
-impl QueenPlacement {
-    fn new(row: usize, col: usize) -> Self {
-        Self {
-            position: (row, col),
-            blocked: Vec::new(),
-        }
-    }
-
-    fn add_blocked(&mut self, row: usize, col: usize) {
-        self.blocked.push((row, col))
-    }
 }
 
 impl<const N: usize> QueenBoard<N> {
     pub fn new() -> Self {
         Self {
             board: [[Piece::Empty; N]; N],
-            can_place: [[true; N]; N],
         }
     }
 
@@ -54,45 +34,23 @@ impl<const N: usize> QueenBoard<N> {
         diagonals.collect()
     }
 
-    fn undo_placement(&mut self, placement: QueenPlacement) {
-        let (row, col) = placement.position;
-        self.board[row][col] = Piece::Empty;
-        for (r, c) in placement.blocked {
-            self.can_place[r][c] = true
-        }
-    }
-
-    /// Tries to place a queen, if it can it will return all "new" blocked positions
-    fn try_place_queen(&mut self, row: usize, col: usize) -> Option<QueenPlacement> {
+    fn check_valid(&mut self, row: usize, col: usize) -> bool {
         if row >= N || col >= N {
-            return None;
+            return false;
         }
-        if self.can_place[row][col] {
-            self.board[row][col] = Piece::Queen;
-            let mut placement = QueenPlacement::new(row, col);
-            for r in 0..N {
-                if self.can_place[r][col] == true {
-                    placement.add_blocked(r, col);
-                }
-                self.can_place[r][col] = false;
-            }
 
-            for c in 0..N {
-                if self.can_place[row][c] == true {
-                    placement.add_blocked(row, c);
-                }
-                self.can_place[row][c] = false;
+        for r in 0..N {
+            if self.board[r][col] == Piece::Queen {
+                return false;
             }
-
-            for (r, c) in self.diagonals(row, col) {
-                if self.can_place[r][c] == true {
-                    placement.add_blocked(r, c);
-                }
-                self.can_place[r][c] = false;
-            }
-            return Some(placement);
         }
-        None
+
+        for (r, c) in self.diagonals(row, col) {
+            if self.board[r][c] == Piece::Queen {
+                return false;
+            }
+        }
+        return true;
     }
 
     pub fn valid_boards(&mut self) -> Vec<Self> {
@@ -109,9 +67,10 @@ impl<const N: usize> QueenBoard<N> {
         }
 
         for col in 0..N {
-            if let Some(placement) = self.try_place_queen(row, col) {
+            if self.check_valid(row, col) {
+                self.board[row][col] = Piece::Queen;
                 self.valid_boards_helper(row + 1, results);
-                self.undo_placement(placement);
+                self.board[row][col] = Piece::Empty;
             }
         }
     }
